@@ -1,6 +1,7 @@
-// --------------------------- Function ------------------------------															  
+// fxPath
+// --------------------------- Function ------------------------------
 let
-  // --------------------------- Function segment -----------------------------------																				 
+  // --------------------------- Function segment -----------------------------------
   fxPath = (
     PathTable as table, 
     EntityKeyColumn as text, 
@@ -28,7 +29,7 @@ let
     in
       finalPath,
 
-  // --------------------------- Documentation segment ------------------------------																					 
+  // --------------------------- Documentation segment ------------------------------
   documentation = [
     Documentation.Name = "fxPath",
     Documentation.Description = "This function calculates the hierarchical path for a given entity within a parent-child structure, similar to the DAX PATH function.",
@@ -39,12 +40,12 @@ let
     {
       [
         Description = "Calculate the path for entity with EntityKey = 4",
-        Code = "fxPath(EntityTable, ""EntityKey"", ""ParentEntityKey"", [EntityKey] )",
+        Code = "fxPath(EntityTable, ""EntityKey"", ""ParentEntityKey"", 4 )",
         Result = "1|4"
       ]
     }
   ]
-// --------------------------- Output --------------------------------------------																			  
+// --------------------------- Output ----------------------------------------------
 in
   Value.ReplaceType(
     fxPath,
