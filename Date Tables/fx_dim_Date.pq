@@ -52,15 +52,27 @@ let
     LatestMonth = Date.Month(LatestDate),
     LatestQuarter = Date.QuarterOfYear(LatestDate),
     
+    // Calculate start dates for the last 3, 6, 9, 12 months
+    Start3Months = Date.AddMonths(LatestDate, -3),
+    Start6Months = Date.AddMonths(LatestDate, -6),
+    Start9Months = Date.AddMonths(LatestDate, -9),
+    Start12Months = Date.AddMonths(LatestDate, -12),
+    
     // Add flag columns for latest date, year-week, year-month, and year-quarter
     #"Added Latest Date Flag" = Table.AddColumn(#"Added Month Name S", "Is Latest Date", each if [Date] = LatestDate then true else false, Logical.Type),
     #"Added Latest Year Week Flag" = Table.AddColumn(#"Added Latest Date Flag", "Is Latest Year Week", each if [Year] = LatestYear and [Week of Year] = LatestWeek then true else false, Logical.Type),
     #"Added Latest Year Month Flag" = Table.AddColumn(#"Added Latest Year Week Flag", "Is Latest Year Month", each if [Year] = LatestYear and [Month] = LatestMonth then true else false, Logical.Type),
     #"Added Latest Year Quarter Flag" = Table.AddColumn(#"Added Latest Year Month Flag", "Is Latest Year Quarter", each if [Year] = LatestYear and [Quarter] = LatestQuarter then true else false, Logical.Type),
     
+    // Add flags for last 3, 6, 9, 12 months
+    #"Added Last 3 Months Flag" = Table.AddColumn(#"Added Latest Year Quarter Flag", "Last 3 Months", each [Date] >= Start3Months and [Date] <= LatestDate, type logical),
+    #"Added Last 6 Months Flag" = Table.AddColumn(#"Added Last 3 Months Flag", "Last 6 Months", each [Date] >= Start6Months and [Date] <= LatestDate, type logical),
+    #"Added Last 9 Months Flag" = Table.AddColumn(#"Added Last 6 Months Flag", "Last 9 Months", each [Date] >= Start9Months and [Date] <= LatestDate, type logical),
+    #"Added Last 12 Months Flag" = Table.AddColumn(#"Added Last 9 Months Flag", "Last 12 Months", each [Date] >= Start12Months and [Date] <= LatestDate, type logical),
+    
     // Add the prefix to all columns in a final step
-    ColumnsToRename = Table.ColumnNames(#"Added Latest Year Quarter Flag"),
-    RenamedColumns = Table.RenameColumns(#"Added Latest Year Quarter Flag", List.Transform(ColumnsToRename, each {_, Prefix & _}))
+    ColumnsToRename = Table.ColumnNames(#"Added Last 12 Months Flag"),
+    RenamedColumns = Table.RenameColumns(#"Added Last 12 Months Flag", List.Transform(ColumnsToRename, each {_, Prefix & _}))
     
 in
     RenamedColumns
