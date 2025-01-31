@@ -1,8 +1,7 @@
+(DateColumn as list, Prefix as text) =>
 let
-    Source = (DateColumn as list, Prefix as text) =>
-let
-    // Get list of dates
-    Source = DateColumn,
+    // Get distinct list of dates
+    Source = List.Distinct(DateColumn),
     
     // Define the earliest date
     EarliestDate = List.Min(Source),
@@ -33,8 +32,11 @@ let
     #"Inserted Day Name" = Table.AddColumn(#"Inserted Day of Week", "Day Name", each Date.DayOfWeekName([Date]), type text),
     #"Extracted First Characters Day Name" = Table.TransformColumns(#"Inserted Day Name", {{"Day Name", each Text.Start(_, 3), type text}}),
     
+    // Add Weekend Flag column
+    #"Added Weekend Flag" = Table.AddColumn(#"Extracted First Characters Day Name", "Is Weekend", each [Day Name] = "Sat" or [Day Name] = "Sun", type logical),
+    
     // Add SortYearMonth, Year Month, SortYearWeek, Year Week, SortYearQuarter, Year Quarter
-    #"Added SortYearMonth" = Table.AddColumn(#"Extracted First Characters Day Name", "SortYearMonth", each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type),
+    #"Added SortYearMonth" = Table.AddColumn(#"Added Weekend Flag", "SortYearMonth", each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type),
     #"Inserted Year Month" = Table.AddColumn(#"Added SortYearMonth", "Year Month", each Text.Combine({Text.From([Year], "en-US"), [Month Name]}, " "), type text),
     #"Added SortYearWeek" = Table.AddColumn(#"Inserted Year Month", "SortYearWeek", each Date.Year([Date]) * 100 + Date.WeekOfYear([Date]), Int64.Type),
     #"Inserted Year Week" = Table.AddColumn(#"Added SortYearWeek", "Year Week", each Text.Combine({Text.From([Year], "en-US"), Text.PadStart(Text.From([Week of Year], "en-US"), 2, "0")}, " "), type text),
@@ -62,5 +64,3 @@ let
     
 in
     RenamedColumns
-in
-    Source
