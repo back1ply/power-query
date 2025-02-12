@@ -45,7 +45,9 @@ let
     
     // Added Month Name S (Special formatting for Month name)
     #"Added Month Name S" = Table.AddColumn(#"Inserted Year Quarter", "Month Name S", each Text.Repeat(Character.FromNumber(8203), 12 - Date.Month([Date])) & Text.Start(Date.MonthName([Date]), 1), type text),
-    
+    #"Added Week Day S" = Table.AddColumn(#"Added Month Name S", "Week Day S", each Text.Repeat(Character.FromNumber(8203), 7 - Date.DayOfWeek([Date])) & Text.Start(Date.DayOfWeekName([Date]), 1), type text),
+
+
     // Define the latest year, week, month, quarter based on the latest date
     LatestYear = Date.Year(LatestDate),
     LatestWeek = Date.WeekOfYear(LatestDate),
@@ -59,7 +61,7 @@ let
     Start12Months = Date.AddMonths(LatestDate, -12),
     
     // Add flag columns for latest date, year-week, year-month, and year-quarter
-    #"Added Latest Date Flag" = Table.AddColumn(#"Added Month Name S", "Is Latest Date", each if [Date] = LatestDate then true else false, Logical.Type),
+    #"Added Latest Date Flag" = Table.AddColumn(#"Added Week Day S", "Is Latest Date", each if [Date] = LatestDate then true else false, Logical.Type),
     #"Added Latest Year Week Flag" = Table.AddColumn(#"Added Latest Date Flag", "Is Latest Year Week", each if [Year] = LatestYear and [Week of Year] = LatestWeek then true else false, Logical.Type),
     #"Added Latest Year Month Flag" = Table.AddColumn(#"Added Latest Year Week Flag", "Is Latest Year Month", each if [Year] = LatestYear and [Month] = LatestMonth then true else false, Logical.Type),
     #"Added Latest Year Quarter Flag" = Table.AddColumn(#"Added Latest Year Month Flag", "Is Latest Year Quarter", each if [Year] = LatestYear and [Quarter] = LatestQuarter then true else false, Logical.Type),
