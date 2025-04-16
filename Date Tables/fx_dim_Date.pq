@@ -1,4 +1,3 @@
-// fx_Dim_Date
 (DateColumn1 as list, optional DateColumn2 as list, optional Prefix as text) =>
 let
     // Handle null parameters
@@ -28,41 +27,41 @@ let
     #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table", {{"Date", type date}}),
     
     // Insert Year, Month, Quarter, Week, and other derived columns
-    #"Inserted Year" = Table.AddColumn(#"Changed Type", "Year", each Date.Year([Date]), Int64.Type),
-    #"Inserted Month" = Table.AddColumn(#"Inserted Year", "Month", each Date.Month([Date]), Int64.Type),
-    #"Inserted Month Name" = Table.AddColumn(#"Inserted Month", "Month Name", each Text.Start(Date.MonthName([Date]), 3), type text),
-    #"Inserted Quarter" = Table.AddColumn(#"Inserted Month Name", "Quarter", each Date.QuarterOfYear([Date]), Int64.Type),
+    #"Inserted Num Year" = Table.AddColumn(#"Changed Type", "Num Year", each Date.Year([Date]), Int64.Type),
+    #"Inserted Num Month" = Table.AddColumn(#"Inserted Num Year", "Num Month", each Date.Month([Date]), Int64.Type),
+    #"Inserted Txt Month Name" = Table.AddColumn(#"Inserted Num Month", "Txt Month Name", each Text.Start(Date.MonthName([Date]), 3), type text),
+    #"Inserted Num Quarter" = Table.AddColumn(#"Inserted Txt Month Name", "Num Quarter", each Date.QuarterOfYear([Date]), Int64.Type),
     
     // Add new column "Q" + quarter number
-    #"Inserted Q Format" = Table.AddColumn(#"Inserted Quarter", "Q Format", each "Q" & Text.From([Quarter]), type text),
+    #"Inserted Txt Quarter Format" = Table.AddColumn(#"Inserted Num Quarter", "Txt Quarter Format", each "Q" & Text.From([Num Quarter]), type text),
     
-    #"Inserted Week of Year" = Table.AddColumn(#"Inserted Q Format", "Week of Year", each Date.WeekOfYear([Date]), Int64.Type),
+    #"Inserted Num Week" = Table.AddColumn(#"Inserted Txt Quarter Format", "Num Week", each Date.WeekOfYear([Date]), Int64.Type),
     
     // Add new column "W" + week of year number (padded to 2 digits)
-    #"Inserted W Format" = Table.AddColumn(#"Inserted Week of Year", "W Format", each "W" & Text.PadStart(Text.From([Week of Year]), 2, "0"), type text),
+    #"Inserted Txt Week Format" = Table.AddColumn(#"Inserted Num Week", "Txt Week Format", each "W" & Text.PadStart(Text.From([Num Week]), 2, "0"), type text),
     
-    #"Inserted Day of Week" = Table.AddColumn(#"Inserted W Format", "Day of Week", each Date.DayOfWeek([Date]), Int64.Type),
-    #"Inserted Day Name" = Table.AddColumn(#"Inserted Day of Week", "Day Name", each Text.Start(Date.DayOfWeekName([Date]), 3), type text),
+    #"Inserted Num Day" = Table.AddColumn(#"Inserted Txt Week Format", "Num Day", each Date.DayOfWeek([Date]), Int64.Type),
+    #"Inserted Txt Day Name" = Table.AddColumn(#"Inserted Num Day", "Txt Day Name", each Text.Start(Date.DayOfWeekName([Date]), 3), type text),
     
     // Add Weekend Flag column (simplified logic)
-    #"Added Weekend Flag" = Table.AddColumn(#"Inserted Day Name", "Is Weekend", each [Day of Week] >= 5, type logical),
+    #"Added Bool Is Weekend" = Table.AddColumn(#"Inserted Txt Day Name", "Bool Is Weekend", each [Num Day] >= 5, type logical),
     
     // Add explicit sort columns and formatted display columns
     // Year-Month sorting and display
-    #"Added SortYearMonth" = Table.AddColumn(#"Added Weekend Flag", "SortYearMonth", each [Year] * 100 + [Month], Int64.Type),
-    #"Added Year Month" = Table.AddColumn(#"Added SortYearMonth", "Year Month", each Text.From([Year]) & " " & [Month Name], type text),
+    #"Added Num Sort Year Month" = Table.AddColumn(#"Added Bool Is Weekend", "Num Sort Year Month", each [Num Year] * 100 + [Num Month], Int64.Type),
+    #"Added Txt Year Month" = Table.AddColumn(#"Added Num Sort Year Month", "Txt Year Month", each Text.From([Num Year]) & " " & [Txt Month Name], type text),
     
     // Year-Week sorting and display
-    #"Added SortYearWeek" = Table.AddColumn(#"Added Year Month", "SortYearWeek", each [Year] * 100 + [Week of Year], Int64.Type),
-    #"Added Year Week" = Table.AddColumn(#"Added SortYearWeek", "Year Week", each Text.From([Year]) & " W" & Text.PadStart(Text.From([Week of Year]), 2, "0"), type text),
+    #"Added Num Sort Year Week" = Table.AddColumn(#"Added Txt Year Month", "Num Sort Year Week", each [Num Year] * 100 + [Num Week], Int64.Type),
+    #"Added Txt Year Week" = Table.AddColumn(#"Added Num Sort Year Week", "Txt Year Week", each Text.From([Num Year]) & " W" & Text.PadStart(Text.From([Num Week]), 2, "0"), type text),
     
     // Year-Quarter sorting and display
-    #"Added SortYearQuarter" = Table.AddColumn(#"Added Year Week", "SortYearQuarter", each [Year] * 10 + [Quarter], Int64.Type),
-    #"Added Year Quarter" = Table.AddColumn(#"Added SortYearQuarter", "Year Quarter", each Text.From([Year]) & " Q" & Text.From([Quarter]), type text),
+    #"Added Num Sort Year Quarter" = Table.AddColumn(#"Added Txt Year Week", "Num Sort Year Quarter", each [Num Year] * 10 + [Num Quarter], Int64.Type),
+    #"Added Txt Year Quarter" = Table.AddColumn(#"Added Num Sort Year Quarter", "Txt Year Quarter", each Text.From([Num Year]) & " Q" & Text.From([Num Quarter]), type text),
     
     // Add special formatting columns for Month Name and Week Day
-    #"Added Month Name S" = Table.AddColumn(#"Added Year Quarter", "Month Name S", each Text.Repeat(Character.FromNumber(8203), 12 - [Month]) & Text.Start(Date.MonthName([Date]), 1), type text),
-    #"Added Week Day S" = Table.AddColumn(#"Added Month Name S", "Week Day S", each Text.Repeat(Character.FromNumber(8203), 7 - [Day of Week]) & Text.Start(Date.DayOfWeekName([Date]), 1), type text),
+    #"Added Txt Month Name Sort" = Table.AddColumn(#"Added Txt Year Quarter", "Txt Month Name Sort", each Text.Repeat(Character.FromNumber(8203), 12 - [Num Month]) & Text.Start(Date.MonthName([Date]), 1), type text),
+    #"Added Txt Week Day Sort" = Table.AddColumn(#"Added Txt Month Name Sort", "Txt Week Day Sort", each Text.Repeat(Character.FromNumber(8203), 7 - [Num Day]) & Text.Start(Date.DayOfWeekName([Date]), 1), type text),
 
     // Define the latest date components based on the latest date
     LatestYear = Date.Year(MaxDate),
@@ -71,13 +70,13 @@ let
     LatestQuarter = Date.QuarterOfYear(MaxDate),
     
     // Add flag columns for latest date, year-week, year-month, and year-quarter
-    #"Added Latest Date Flag" = Table.AddColumn(#"Added Week Day S", "Is Latest Date", each [Date] = MaxDate, Logical.Type),
-    #"Added Latest Year Week Flag" = Table.AddColumn(#"Added Latest Date Flag", "Is Latest Year Week", each [Year] = LatestYear and [Week of Year] = LatestWeek, Logical.Type),
-    #"Added Latest Year Month Flag" = Table.AddColumn(#"Added Latest Year Week Flag", "Is Latest Year Month", each [Year] = LatestYear and [Month] = LatestMonth, Logical.Type),
-    #"Added Latest Year Quarter Flag" = Table.AddColumn(#"Added Latest Year Month Flag", "Is Latest Year Quarter", each [Year] = LatestYear and [Quarter] = LatestQuarter, Logical.Type),
+    #"Added Bool Is Latest Date" = Table.AddColumn(#"Added Txt Week Day Sort", "Bool Is Latest Date", each [Date] = MaxDate, type logical),
+    #"Added Bool Is Latest Year Week" = Table.AddColumn(#"Added Bool Is Latest Date", "Bool Is Latest Year Week", each [Num Year] = LatestYear and [Num Week] = LatestWeek, type logical),
+    #"Added Bool Is Latest Year Month" = Table.AddColumn(#"Added Bool Is Latest Year Week", "Bool Is Latest Year Month", each [Num Year] = LatestYear and [Num Month] = LatestMonth, type logical),
+    #"Added Bool Is Latest Year Quarter" = Table.AddColumn(#"Added Bool Is Latest Year Month", "Bool Is Latest Year Quarter", each [Num Year] = LatestYear and [Num Quarter] = LatestQuarter, type logical),
     
     // Keep the sort columns as they're more explicit and reliable
-    #"Final Columns" = #"Added Latest Year Quarter Flag",
+    #"Final Columns" = #"Added Bool Is Latest Year Quarter",
     
     // Add the prefix to all column names in a final step
     FinalTable = if SafePrefix = "" then #"Final Columns" else 
