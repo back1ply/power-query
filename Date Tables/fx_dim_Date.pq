@@ -60,8 +60,8 @@ let
     #"Added Txt Year Quarter" = Table.AddColumn(#"Added Num Sort Year Quarter", "Txt Year Quarter", each Text.From([Num Year]) & " Q" & Text.From([Num Quarter]), type text),
     
     // Add special formatting columns for Month Name and Week Day
-    #"Added Txt Month Name Sort" = Table.AddColumn(#"Added Txt Year Quarter", "Txt Month Name Sort", each Text.Repeat(Character.FromNumber(8203), 12 - [Num Month]) & Text.Start(Date.MonthName([Date]), 1), type text),
-    #"Added Txt Week Day Sort" = Table.AddColumn(#"Added Txt Month Name Sort", "Txt Week Day Sort", each Text.Repeat(Character.FromNumber(8203), 7 - [Num Day]) & Text.Start(Date.DayOfWeekName([Date]), 1), type text),
+    #"Added Txt Month Name Short" = Table.AddColumn(#"Added Txt Year Quarter", "Txt Month Name Short", each Text.Repeat(Character.FromNumber(8203), 12 - [Num Month]) & Text.Start(Date.MonthName([Date]), 1), type text),
+    #"Added Txt Week Day Short" = Table.AddColumn(#"Added Txt Month Name Short", "Txt Week Day Short", each Text.Repeat(Character.FromNumber(8203), 7 - [Num Day]) & Text.Start(Date.DayOfWeekName([Date]), 1), type text),
 
     // Define the latest date components based on the latest date
     LatestYear = Date.Year(MaxDate),
@@ -70,7 +70,7 @@ let
     LatestQuarter = Date.QuarterOfYear(MaxDate),
     
     // Add flag columns for latest date, year-week, year-month, and year-quarter
-    #"Added Bool Is Latest Date" = Table.AddColumn(#"Added Txt Week Day Sort", "Bool Is Latest Date", each [Date] = MaxDate, type logical),
+    #"Added Bool Is Latest Date" = Table.AddColumn(#"Added Txt Week Day Short", "Bool Is Latest Date", each [Date] = MaxDate, type logical),
     #"Added Bool Is Latest Year Week" = Table.AddColumn(#"Added Bool Is Latest Date", "Bool Is Latest Year Week", each [Num Year] = LatestYear and [Num Week] = LatestWeek, type logical),
     #"Added Bool Is Latest Year Month" = Table.AddColumn(#"Added Bool Is Latest Year Week", "Bool Is Latest Year Month", each [Num Year] = LatestYear and [Num Month] = LatestMonth, type logical),
     #"Added Bool Is Latest Year Quarter" = Table.AddColumn(#"Added Bool Is Latest Year Month", "Bool Is Latest Year Quarter", each [Num Year] = LatestYear and [Num Quarter] = LatestQuarter, type logical),
