@@ -1,3 +1,5 @@
+// fx_Dim_Date
+// fx_Dim_Date
 (DateColumn1 as list, optional DateColumn2 as list, optional Prefix as text) =>
 let
     // Handle null parameters
@@ -44,8 +46,8 @@ let
     #"Inserted Txt Day Name" = Table.AddColumn(#"Inserted Num Day", "Txt Day Name", each Text.Start(Date.DayOfWeekName([Date]), 3), type text),
     
     // Add Weekend Flag column (simplified logic)
-    #"Added Bool Is Weekend" = Table.AddColumn(#"Inserted Txt Day Name", "Bool Is Weekend", each [Num Day] >= 5, type logical),
-    
+    #"Added Bool Is Weekend" = Table.AddColumn(#"Inserted Txt Day Name", "Bool Is Weekend", each [Txt Day Name] = "Sat" or [Txt Day Name] = "Sun", type logical),
+
     // Add explicit sort columns and formatted display columns
     // Year-Month sorting and display
     #"Added Num Sort Year Month" = Table.AddColumn(#"Added Bool Is Weekend", "Num Sort Year Month", each [Num Year] * 100 + [Num Month], Int64.Type),
@@ -79,7 +81,12 @@ let
     #"Final Columns" = #"Added Bool Is Latest Year Quarter",
     
     // Add the prefix to all column names in a final step
-    FinalTable = if SafePrefix = "" then #"Final Columns" else 
-                  Table.PrefixColumns(#"Final Columns", SafePrefix)
+    FinalTable = if SafePrefix = "" then #"Final Columns" else
+                Table.RenameColumns(#"Final Columns", 
+                    List.Transform(
+                    Table.ColumnNames(#"Final Columns"),
+                    each {_, SafePrefix & _}
+                    )
+                )
 in
     FinalTable
