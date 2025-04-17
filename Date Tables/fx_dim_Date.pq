@@ -1,5 +1,3 @@
-// fx_Dim_Date
-// fx_Dim_Date
 (DateColumn1 as list, optional DateColumn2 as list, optional Prefix as text) =>
 let
     // Handle null parameters
