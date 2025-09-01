@@ -84,7 +84,7 @@ let
                 Table.RenameColumns(#"Final Columns", 
                     List.Transform(
                     Table.ColumnNames(#"Final Columns"),
-                    each {, SafePrefix & }
+                    each {_, SafePrefix & _}
                     )
                 )
 in
