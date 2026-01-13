@@ -1,4 +1,3 @@
-// fnSmartFile
 // Query written by Ken Puls, FCPA, FCMA, MS MVP (Excel) (www.excelguru.ca)
 // Injected into this workbook via Monkey Tools at the model designer's request
 // For more information, Or to purchase a copy of this add-in, visit https://monkeytools.ca
